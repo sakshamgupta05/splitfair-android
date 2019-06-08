@@ -14,5 +14,10 @@
     <string name="menu_share">Share</string>
     <string name="menu_send">Send</string>
     
-    <string name="sms_warning">By continuing you may receive an SMS for verification. Message and data rates may apply.</string>
+    <string name="warning_message">By continuing you may receive an SMS for verification. Message and data rates may apply.</string>
+    <string name="hint_phone_number">Phone Number</string>
+    <string name="hint_verification_code">Verification Code</string>
+    <string name="button_verify">Verify</string>
+    <string name="button_resend">Resend</string>
+    <string name="instant_validation">(instant validation)</string>
 </resources>
