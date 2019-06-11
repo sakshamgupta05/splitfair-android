@@ -14,6 +14,11 @@ import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.*
 import kotlinx.android.synthetic.main.activity_login_phone.*
 import java.util.concurrent.TimeUnit
+import com.truecaller.android.sdk.TrueSDK
+import com.truecaller.android.sdk.TrueSdkScope
+import com.truecaller.android.sdk.TrueError
+import com.truecaller.android.sdk.TrueProfile
+import com.truecaller.android.sdk.ITrueCallback
 
 class LoginActivity : AppCompatActivity() {
 
@@ -45,6 +50,40 @@ class LoginActivity : AppCompatActivity() {
 
         // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance()
+
+        // truecaller sdk callback
+        val sdkCallback = object : ITrueCallback {
+            override fun onVerificationRequired() {
+                Log.d("aaaaaaaaaa", "Verification Required : ")
+            }
+
+            override fun onSuccessProfileShared(trueProfile: TrueProfile) {
+
+                // This method is invoked when the truecaller app is installed on the device and the user gives his
+                // consent to share his truecaller profile
+
+                Log.d("aaaaaaaaaa", "Verified Successfully : ${trueProfile.firstName} ${trueProfile.lastName} ${trueProfile.phoneNumber}")
+            }
+
+            override fun onFailureProfileShared(trueError: TrueError) {
+                // This method is invoked when some error occurs or if an invalid request for verification is made
+
+                Log.d("aaaaaaaaaa", "onFailureProfileShared: " + trueError.errorType)
+            }
+        }
+
+        // truecaller sdk init
+        val trueScope = TrueSdkScope.Builder(this, sdkCallback)
+            .consentMode(TrueSdkScope.CONSENT_MODE_POPUP)
+            .consentTitleOption(TrueSdkScope.SDK_CONSENT_TITLE_VERIFY)
+            .footerType(TrueSdkScope.FOOTER_TYPE_SKIP)
+            .build()
+
+        TrueSDK.init(trueScope)
+
+        if (!TrueSDK.getInstance().isUsable) {
+            buttonTruecaller.visibility = View.GONE
+        }
 
         // Initialize phone auth callbacks
         callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
@@ -295,6 +334,10 @@ class LoginActivity : AppCompatActivity() {
         } else {
             super.onBackPressed()
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        TrueSDK.getInstance().onActivityResultObtained( this, resultCode, data);
     }
 
     companion object {
